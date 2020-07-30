@@ -8,12 +8,14 @@ import (
 	"github.com/tdtk/go-server/model"
 )
 
+// UserRepository is ...
 type UserRepository struct {
 	db *sql.DB
 }
 
+// NewUserRepository is ...
 func NewUserRepository() *UserRepository {
-	db, err := sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/user")
+	db, err := sql.Open("mysql", "root:password@tcp(127.0.0.1:3306)/user")
 
 	if err != nil {
 		panic(err.Error())
@@ -22,6 +24,7 @@ func NewUserRepository() *UserRepository {
 	return &UserRepository{db: db}
 }
 
+// FindAllUser is ...
 func (repo *UserRepository) FindAllUser() []model.UserInfo {
 	results, err := repo.db.Query("select * from user_info")
 
@@ -45,6 +48,7 @@ func (repo *UserRepository) FindAllUser() []model.UserInfo {
 	return users
 }
 
+// Close is ...
 func (repo *UserRepository) Close() {
 	defer repo.db.Close()
 }
