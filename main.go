@@ -28,9 +28,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 		panic(err.Error())
 	}
 	var repo = repository.NewUserRepository()
-	var pass = repo.GetPasswordByID(params.UserID)
+	var pass = repo.GetPasswordByID(params.LoginID)
 	if pass == params.Password {
-		w.Header().Add("token", fmt.Sprintf("%s.%s", params.UserID, params.Password))
+		w.Header().Add("token", fmt.Sprintf("%s.%s", params.LoginID, params.Password))
 	} else {
 		http.Error(w, "This password is wrong!", 500)
 	}

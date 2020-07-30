@@ -2,6 +2,6 @@ package model
 
 // LoginFormParams is ...
 type LoginFormParams struct {
-	UserID   string
-	Password string
+	LoginID  string `json:"login_id"`
+	Password string `json:"password"`
 }

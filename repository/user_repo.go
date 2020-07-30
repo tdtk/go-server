@@ -50,8 +50,8 @@ func (repo *UserRepository) FindAllUser() []model.UserInfo {
 }
 
 // GetPasswordByID is ...
-func (repo *UserRepository) GetPasswordByID(userID string) string {
-	results, err := repo.db.Query(fmt.Sprintf("select password from user_info where user_id=%s", userID))
+func (repo *UserRepository) GetPasswordByID(loginID string) string {
+	results, err := repo.db.Query(fmt.Sprintf("select password from user_info where login_id='%s'", loginID))
 
 	if err != nil {
 		panic(err.Error())
