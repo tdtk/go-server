@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -46,6 +47,27 @@ func (repo *UserRepository) FindAllUser() []model.UserInfo {
 	}
 
 	return users
+}
+
+// GetPasswordByID is ...
+func (repo *UserRepository) GetPasswordByID(userID string) string {
+	results, err := repo.db.Query(fmt.Sprintf("select password from user_info where user_id=%s", userID))
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	for results.Next() {
+		var pass string
+		err = results.Scan(&pass)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		return pass
+	}
+	panic("Can't get password!")
 }
 
 // Close is ...
