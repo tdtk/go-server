@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  mysql:
+    image: mysql:8.0
+    volumes:
+      - db-store:/var/lib/mysql
+      - ./logs:/var/log/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/mysql/initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
+      - MYSQL_ROOT_PASSWORD=${DB_PASS}
+      - TZ=${TZ}
+    ports:
+      - ${DB_PORT}:3306
+
+  web:
+    build:
+      context: .
+      dockerfile: ./docker/golang/Dockerfile
+    container_name: web
+    volumes:
+      - .:/go/src/server
+    ports:
+      - "8080:8080"
+    command: go run main.go
+
+volumes:
+  db-store:
