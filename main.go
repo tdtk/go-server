@@ -8,7 +8,11 @@ import (
 )
 
 func helloHandler(w http.ResponseWriter, r *http.Request) {
-	repository.Connect()
+	var repo = repository.NewUserRepository()
+	var users = repo.FindAllUser()
+	for _, user := range users {
+		fmt.Fprintf(w, "%+v\n", user)
+	}
 	fmt.Fprint(w, "Hello from go")
 }
 
