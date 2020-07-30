@@ -23,7 +23,7 @@ services:
       dockerfile: ./docker/golang/Dockerfile
     container_name: web
     volumes:
-      - .:/go/src/server
+      - .:/go/src/github.com/tdtk/go-server
     ports:
       - "8080:8080"
     command: go run main.go

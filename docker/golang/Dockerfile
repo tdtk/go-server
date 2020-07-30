@@ -1,6 +1,6 @@
 FROM golang:1.8
 
-WORKDIR /go/src/server
+WORKDIR /go/src/github.com/tdtk/go-server
 
 ADD . .
 
