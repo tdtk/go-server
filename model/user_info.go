@@ -3,7 +3,7 @@ package model
 // UserInfo is ...
 type UserInfo struct {
 	UserID    int    `json:"user_id"`
-	LoginID   int    `json:"login_id"`
+	LoginID   string `json:"login_id"`
 	UserName  string `json:"user_name"`
 	Telephone string `json:"telephone"`
 	Password  string `json:"password"`
