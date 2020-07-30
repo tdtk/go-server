@@ -1,9 +1,11 @@
-FROM golang:1.8
+FROM golang:1.11
 
 WORKDIR /go/src/github.com/tdtk/go-server
 
-RUN go mod download
+ENV GO111MODULE=on
 
 ADD . .
+
+RUN go mod download
 
 RUN go build
