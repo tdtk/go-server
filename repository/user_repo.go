@@ -36,7 +36,7 @@ func (repo *UserRepository) FindAllUser() []model.UserInfo {
 
 	for results.Next() {
 		var user model.UserInfo
-		err = results.Scan(&user.UserID, &user.LoginID, &user.UserName, &user.Telephone, &user.RoleID)
+		err = results.Scan(&user.UserID, &user.LoginID, &user.UserName, &user.Telephone, &user.Password, &user.RoleID)
 
 		if err != nil {
 			panic(err.Error())
