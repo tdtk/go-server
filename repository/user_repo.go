@@ -13,7 +13,7 @@ type UserRepository struct {
 }
 
 func NewUserRepository() *UserRepository {
-	db, err := sql.Open("mysql", "user:password@tcp(127.0.0.1:13306)/user")
+	db, err := sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/user")
 
 	if err != nil {
 		panic(err.Error())
