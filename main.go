@@ -3,10 +3,14 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"time"
 
 	"encoding/json"
 	"strconv"
-	"strings"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go/request"
 
 	"github.com/tdtk/go-server/model"
 	"github.com/tdtk/go-server/repository"
@@ -22,9 +26,23 @@ func login(w http.ResponseWriter, r *http.Request) {
 	var repo = repository.NewUserRepository()
 	var pass, userID = repo.GetPasswordByID(params.LoginID)
 	if pass == params.Password {
+
+		token := jwt.New(jwt.SigningMethodHS256)
+
+		claims := token.Claims.(jwt.MapClaims)
+		claims["name"] = params.LoginID
+		claims["admin"] = true
+		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+		tokenString, err := token.SignedString([]byte(os.Getenv("SIGNINGKEY")))
+		if err != nil {
+			http.Error(w, "This password is wrong", 500)
+			panic(err)
+		}
+
 		var encoder = json.NewEncoder(w)
 		m := make(map[string]string)
-		m["accessToken"] = fmt.Sprintf("%s.%s", params.LoginID, params.Password)
+		m["accessToken"] = tokenString
 		m["userID"] = userID
 		encoder.Encode(m)
 	} else {
@@ -35,19 +53,21 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 func check(f func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		token := r.Header.Get("accessToken")
 
-		simpleToken := strings.Split(token, ".")
-		loginID := simpleToken[0]
-		password := simpleToken[1]
-		var repo = repository.NewUserRepository()
-		var pass, _ = repo.GetPasswordByID(loginID)
-		if pass != password {
-			http.Error(w, "Invalid AccessToken", 555)
-		} else {
+		token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor, func(token *jwt.Token) (interface{}, error) {
+			_, err := token.Method.(*jwt.SigningMethodHMAC)
+			if !err {
+				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			} else {
+				return []byte(os.Getenv("SIGNINGKEY")), nil
+			}
+		})
+		if err == nil && token.Valid {
 			f(w, r)
+		} else {
+			w.WriteHeader(http.StatusUnauthorized)
+			http.Error(w, "invalid accessToken", 555)
 		}
-		defer repo.Close()
 	}
 }
 

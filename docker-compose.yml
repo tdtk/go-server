@@ -23,6 +23,8 @@ services:
       context: .
       dockerfile: ./docker/golang/Dockerfile
     container_name: web
+    environment:
+      - SIGNINGKEY=${SIGNINGKEY}
     volumes:
       - .:/go/src/github.com/tdtk/go-server
     ports:
