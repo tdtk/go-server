@@ -30,7 +30,10 @@ func login(w http.ResponseWriter, r *http.Request) {
 	var repo = repository.NewUserRepository()
 	var pass = repo.GetPasswordByID(params.LoginID)
 	if pass == params.Password {
-		w.Header().Add("token", fmt.Sprintf("%s.%s", params.LoginID, params.Password))
+		var encoder = json.NewEncoder(w)
+		m := make(map[string]string)
+		m["accessToken"] = fmt.Sprintf("%s.%s", params.LoginID, params.Password)
+		encoder.Encode(m)
 	} else {
 		http.Error(w, "This password is wrong!", 500)
 	}
