@@ -20,11 +20,12 @@ func login(w http.ResponseWriter, r *http.Request) {
 		panic(err.Error())
 	}
 	var repo = repository.NewUserRepository()
-	var pass = repo.GetPasswordByID(params.LoginID)
+	var pass, userID = repo.GetPasswordByID(params.LoginID)
 	if pass == params.Password {
 		var encoder = json.NewEncoder(w)
 		m := make(map[string]string)
 		m["accessToken"] = fmt.Sprintf("%s.%s", params.LoginID, params.Password)
+		m["userID"] = userID
 		encoder.Encode(m)
 	} else {
 		http.Error(w, "This password is wrong!", 500)
@@ -40,7 +41,7 @@ func check(f func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter,
 		loginID := simpleToken[0]
 		password := simpleToken[1]
 		var repo = repository.NewUserRepository()
-		var pass = repo.GetPasswordByID(loginID)
+		var pass, _ = repo.GetPasswordByID(loginID)
 		if pass != password {
 			http.Error(w, "Invalid AccessToken", 555)
 		} else {

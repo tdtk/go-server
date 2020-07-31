@@ -102,8 +102,8 @@ func (repo *UserRepository) GetUserByID(userID int) model.UserInfo {
 }
 
 // GetPasswordByID is ...
-func (repo *UserRepository) GetPasswordByID(loginID string) string {
-	results, err := repo.db.Query(fmt.Sprintf("select password from user_info where login_id='%s' and is_deleted = 0", loginID))
+func (repo *UserRepository) GetPasswordByID(loginID string) (string, string) {
+	results, err := repo.db.Query(fmt.Sprintf("select password, user_id from user_info where login_id='%s' and is_deleted = 0", loginID))
 
 	if err != nil {
 		panic(err.Error())
@@ -111,13 +111,14 @@ func (repo *UserRepository) GetPasswordByID(loginID string) string {
 
 	for results.Next() {
 		var pass string
-		err = results.Scan(&pass)
+		var userID string
+		err = results.Scan(&pass, &userID)
 
 		if err != nil {
 			panic(err.Error())
 		}
 
-		return pass
+		return pass, userID
 	}
 	panic("Can't get password!")
 }
