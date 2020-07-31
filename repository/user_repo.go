@@ -25,32 +25,8 @@ func NewUserRepository() *UserRepository {
 	return &UserRepository{db: db}
 }
 
-// FindAllUser is ...
-func (repo *UserRepository) FindAllUser() []model.UserInfo {
-	results, err := repo.db.Query("select * from user_info")
-
-	if err != nil {
-		panic(err.Error())
-	}
-
-	var users []model.UserInfo
-
-	for results.Next() {
-		var user model.UserInfo
-		err = results.Scan(&user.UserID, &user.LoginID, &user.UserName, &user.Telephone, &user.Password, &user.RoleID)
-
-		if err != nil {
-			panic(err.Error())
-		}
-
-		users = append(users, user)
-	}
-
-	return users
-}
-
 // SearchUser is ...
-func (repo *UserRepository) SearchUser(userName string, telephone string) []model.UserInfo {
+func (repo *UserRepository) SearchUser(params model.SearchFormParams) []model.UserInfo {
 
 	var query string
 
@@ -58,25 +34,25 @@ func (repo *UserRepository) SearchUser(userName string, telephone string) []mode
 		"from user_info" +
 		"where is_deleted = 0"
 
-	if userName != "" && telephone != "" {
+	if params.UserName != "" && params.Telephone != "" {
 		query = fmt.Sprintf(
 			selectAll+
 				"and user_name like '%%%s%%'"+
 				"and telephone like '%%%s%%'",
-			userName,
-			telephone,
+			params.UserName,
+			params.Telephone,
 		)
-	} else if userName != "" {
+	} else if params.UserName != "" {
 		query = fmt.Sprintf(
 			selectAll+
 				"and user_name like '%%%s%%'",
-			userName,
+			params.UserName,
 		)
-	} else if telephone != "" {
+	} else if params.Telephone != "" {
 		query = fmt.Sprintf(
 			selectAll+
 				"and telephone like '%%%s%%'",
-			telephone,
+			params.Telephone,
 		)
 	} else {
 		query = selectAll
@@ -171,16 +147,16 @@ func (repo *UserRepository) UpdateUser(user model.UserInfo) {
 }
 
 // DeleteUser is ...
-func (repo *UserRepository) DeleteUser() {
-	_, err := repo.db.Query("update user_info set is_deleted = 1")
+func (repo *UserRepository) DeleteUser(userID int) {
+	_, err := repo.db.Query(fmt.Sprintf("update user_info set is_deleted = 1 where userID=%d", userID))
 	if err != nil {
 		panic(err.Error())
 	}
 }
 
 // GetRoleByID is ...
-func (repo *UserRepository) GetRoleByID(roleID string) model.Role {
-	results, err := repo.db.Query(fmt.Sprintf("select * from role where role_id='%s'", roleID))
+func (repo *UserRepository) GetRoleByID(roleID int) model.Role {
+	results, err := repo.db.Query(fmt.Sprintf("select * from role where role_id='%d'", roleID))
 
 	if err != nil {
 		panic(err.Error())
